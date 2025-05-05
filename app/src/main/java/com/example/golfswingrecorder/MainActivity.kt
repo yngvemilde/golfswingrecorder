@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.golfswingrecorder.ui.theme.GolfswingrecorderTheme
@@ -39,25 +40,29 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Flyttet ut av klassen slik at @Preview kan finne den
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ControlScreen(modifier: Modifier = Modifier) {
+    // Hent et Context-objekt som vi kan bruke til å starte/stopp Service
+    val context = LocalContext.current
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(onClick = {
-            // Merk: Context må være en Activity, så her bruker vi LocalContext om nødvendig.
-            // Men i praksis funker startForegroundService fra ComponentActivity-innholdet.
-            // Denne knappen vil fungere når ControlScreen brukes i MainActivity.
+            // Starter SwingService som en forgrunnstjeneste
+            val intent = Intent(context, SwingService::class.java)
+            context.startForegroundService(intent)
         }) {
             Text("Start opptak")
         }
         Button(
             onClick = {
-                // tilsvarende
+                // Stopper SwingService
+                val intent = Intent(context, SwingService::class.java)
+                context.stopService(intent)
             },
             modifier = Modifier.padding(top = 16.dp)
         ) {
